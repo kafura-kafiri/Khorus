@@ -1,0 +1,25 @@
+{
+  "username": "",
+  "password": "",
+  "sheba": "",
+  "firstname": "",
+  "lastname": "",
+  "cellphone": "",
+  "salt": "",
+  "birthdate": "",
+  "roles":{  // may 2 person have save role diff permission.
+    "biker": {
+      "status": ""
+    }
+  }
+  ,
+  "bank": {
+    "name": "",
+    "account": ""
+  },
+  "probation": "",
+  "mellicode": "",
+  "shift": {},
+  "fee_per_order": "",
+  "fixed_salary": "",
+}

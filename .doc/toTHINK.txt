@@ -1,0 +1,3 @@
+load balancing
+HMAC authentication
+rate limiting
