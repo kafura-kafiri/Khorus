@@ -1,33 +1,42 @@
 from sanic.response import text, json
 from crud.user import bp
 from crud.user import users
-from utility import roles_required
+from Choori.decorators import privileges, retrieve
 import jwt
 
 
 @bp.route('/signup', methods=['POST'])
-async def signup(request):
+@retrieve(
+    '<str:form:username>',
+    '<str:form:password>'
+)
+async def signup(request, username, password):
     u = {
-        'username': request.form['username'][0],
-        'password': request.form['password'][0],
-        'roles': ['piaz', 'sir']
+        'username': username,
+        'password': password,
+        'roles': ['dev']
     }
-    from utility import set_password
+    from Choori.utility import set_password
     u['password'] = set_password(u['password'])
-    result = await users.insert_one(u)
-    return text(result.inserted_id)
+    result = await users.insert(u)
+    return json(result)
 
 
 @bp.route('/key', methods=['POST'])
-async def create_key(request):
+@retrieve(
+    '<str:form:username>',
+    '<str:form:password>'
+)
+async def create_key(request, username, password):
     u = {
-        'username': request.form['username'][0],
-        'password': request.form['password'][0]
+        'username': username,
+        'password': password
     }
-    from utility import check_password
-    user = await users.find_one({'username': u['username']})
-    if not user:
+    from Choori.utility import check_password
+    _users = await users.find({'username': u['username']})
+    if not _users:
         return text('user not found')
+    user = _users[0]
     if not check_password(u['password'], user['password']):
         return json({'status': 'not_authorized'}, 403)
     return text(jwt.encode(
@@ -47,6 +56,6 @@ async def logout(request):
 
 
 @bp.route('/protected', methods=['POST', 'GET'])
-@roles_required(['sss'])
+@privileges('dev')
 async def protected(request, payload):
     return text(str(payload))

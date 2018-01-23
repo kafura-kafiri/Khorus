@@ -27,4 +27,3 @@ import jwt
 
 # e_jwt = jwt.encode({'username': 'shahin', 'password': 'qarebaqi'}, 'secret', algorithm='HS256')
 # payload = jwt.decode(e_jwt, 'secret', algorithms=['HS256'])
-

@@ -3,8 +3,28 @@ from sanic import response
 import jwt
 import ujson as json
 
+maximal = {
+    '-u': '--username',
+    '-b': '--bulk',
+    '-s': '--save',
+}
 
-def privileges(roles):
+
+def options():
+    def decorator(f):
+        @wraps(f)
+        async def decorated_function(request, *args, options='', **kwargs):
+            os = options.split('-')
+            for index, op in enumerate(os):
+                if op:
+                    os[index] = maximal.get('-{}'.format(op), '--{}'.format(op))
+            os = [op for op in os if op]
+            return await f(request, *(lambda a, b: a.extend(b) or a)([os], args), **kwargs)
+        return decorated_function
+    return decorator
+
+
+def privileges(*roles):
     def decorator(f):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
@@ -15,7 +35,7 @@ def privileges(roles):
             except:
                 return response.json({'status': 'not_authorized'}, 403)
             if not roles or (payload['roles'] and not set(payload['roles']).isdisjoint(roles)):
-                rv = await f(request, *(lambda a, b: a.extend(b) or a)(args, [payload]), **kwargs)
+                rv = await f(request, *(args + (payload, )), **kwargs)
                 return rv
             else:
                 return response.json({'status': 'roles_disjoint', 'roles_required': roles}, 403)
@@ -23,7 +43,7 @@ def privileges(roles):
     return decorator
 
 
-def retrieve(requirements):
+def retrieve(*requirements):
     def decorator(f):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
@@ -35,37 +55,14 @@ def retrieve(requirements):
                     param = getattr(request, space)[param_name][0]
                     try:
                         param = json.loads(param)
-                    finally:
-                        if type(param) is not _type:
-                            return response.json({'status': 'type mismatch'}, 404)
+                    except: pass
+                    if param.__class__.__name__ != _type:
+                        return response.json({'status': 'type mismatch'}, 404)
                 finally:
-                    if not param:
+                    if param is None:
                         return response.json({'status': "can't retrieve"})
                 parameters.append(param)
-            return await f(request, *(lambda a, b: a.extend(b) or a)(args, parameters), **kwargs)
+            return await f(request, *(args + tuple(parameters)), **kwargs)
         return decorated_function
     return decorator
-
-
-maximal = {
-    '-u': '--username',
-    '-b': '--bulk',
-    '-s': '--symlink',
-}
-
-
-def options():
-    def decorator(f):
-        @wraps(f)
-        async def decorated_function(request, *args, **kwargs):
-            path = request.path
-            os = path.split('-')
-            for index, op in enumerate(os[1:]):
-                if op:
-                    os[index] = maximal.get('-{}'.format(op), '--{}'.format(op))
-            os = [op for op in os if op]
-            return await f(request, *(lambda a, b: a.extend(b) or a)(args, os), **kwargs)
-        return decorated_function
-    return decorator
-
 

@@ -1,0 +1,32 @@
+@bp.route('/{{ name }}', methods=[
+    {% for method in methods %}
+        '{{ method | upper }}',
+    {% endfor %}
+])
+@privileges(
+    {% for privilage in privilages %}
+        '{{ privilage }}',
+    {% endfor %}
+)
+@retrieve(
+    {% for parameter in parameters %}
+        '<{{ parameter.type }}:{{ parameter.space }}:{{ parameter.name }}>',
+    {% endfor %}
+)
+async def send_location(request, payload,
+    {% for parameter in parameters %}
+        {{ parameter.name }},
+    {% endfor %}
+):
+    {% for prime_parameter in prime.parameters %}
+        {{ prime_parameter }},
+    {% endfor %} = render('func_key',
+        {% for paramter in parameters %}
+            {{ parameter.name }}={{ parameter.name }},
+        {% endfor %}
+        )
+    return await _{{ prime.name }}(request, {{ options }},
+        {% for paramter in parameters %}
+            {{ parameter.name }},
+        {% endfor %}
+        )

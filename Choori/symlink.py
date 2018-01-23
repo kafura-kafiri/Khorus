@@ -10,3 +10,4 @@ from Choori.decorators import privileges, retrieve, options
     '<dict:form:inputs>',
 ])
 async def __symlink__(request, options, symlink, inputs):
+    pass
