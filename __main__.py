@@ -1,16 +1,10 @@
 from argparse import ArgumentParser
 import os
-from jinja2 import Environment, FileSystemLoader
 
 '''
 fly to server instead of argument parser
 '''
-
-
-def render(path, data):
-    env = Environment(loader=FileSystemLoader('Choori/templates'))
-    template = env.get_template(path)
-    return template.render(**data)
+from Choori.utility import render
 
 
 def new(singular, plural, path):

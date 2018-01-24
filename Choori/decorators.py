@@ -2,11 +2,12 @@ from functools import wraps
 from sanic import response
 import jwt
 import ujson as json
+import numbers
 
 maximal = {
     '-u': '--username',
     '-b': '--bulk',
-    '-s': '--save',
+    '-s': '--symlink',
 }
 
 
@@ -34,7 +35,7 @@ def privileges(*roles):
                 payload = jwt.decode(key, 'secret', algorithms=['HS256'])
             except:
                 return response.json({'status': 'not_authorized'}, 403)
-            if not roles or (payload['roles'] and not set(payload['roles']).isdisjoint(roles)):
+            if not roles or (payload['privileges'] and not set(payload['privileges']).isdisjoint(roles)):
                 rv = await f(request, *(args + (payload, )), **kwargs)
                 return rv
             else:
@@ -56,7 +57,10 @@ def retrieve(*requirements):
                     try:
                         param = json.loads(param)
                     except: pass
-                    if param.__class__.__name__ != _type:
+                    if _type =='num':
+                        if not isinstance(param, numbers.Real):
+                            return response.json({'status': 'type mismatch'}, 404)
+                    elif param.__class__.__name__ != _type:
                         return response.json({'status': 'type mismatch'}, 404)
                 finally:
                     if param is None:

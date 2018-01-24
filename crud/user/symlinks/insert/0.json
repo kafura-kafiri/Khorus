@@ -1,0 +1,44 @@
+{
+    "ancillary": {
+        "uri": "/send-location",
+        "name": "send_location",
+        "methods": ["POST"],
+        "parameters": {
+            "lat": ["float", "form"],
+            "lng": ["float", "form"]
+        },
+        "privileges": ["dev", "porter"]
+    },
+    "prime": {
+        "name": "insert",
+        "parameters": {
+            "options": ["--bulk"],
+            "payload": {
+                "username": "pouria",
+                "privileges": ["dev"]
+            },
+            "d": {
+                "username": "ali",
+                "password": "23",
+                "status": "available",
+                "lat": "{{ lat }}",
+                "lng": "{{ lng }}"
+            }
+        }
+    },
+    "config": {
+        "name": "user",
+        "path": "users",
+        "collection": {
+            "name": "users",
+            "indexes": [
+                [
+                    [
+                        "title",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

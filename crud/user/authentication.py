@@ -1,5 +1,5 @@
 from sanic.response import text, json
-from crud.user import bp
+from crud.user import authentication_bp as bp
 from crud.user import users
 from Choori.decorators import privileges, retrieve
 import jwt
@@ -14,11 +14,11 @@ async def signup(request, username, password):
     u = {
         'username': username,
         'password': password,
-        'roles': ['dev']
+        'privileges': ['dev']
     }
     from Choori.utility import set_password
     u['password'] = set_password(u['password'])
-    result = await users.insert(u)
+    result = await users.insert([], {}, u)
     return json(result)
 
 
@@ -33,16 +33,17 @@ async def create_key(request, username, password):
         'password': password
     }
     from Choori.utility import check_password
-    _users = await users.find({'username': u['username']})
+    _users = await users.find([], {}, {'username': u['username']}, {})
     if not _users:
         return text('user not found')
     user = _users[0]
+    print(user)
     if not check_password(u['password'], user['password']):
         return json({'status': 'not_authorized'}, 403)
     return text(jwt.encode(
         {
             'username': user['username'],
-            'roles': user['roles']
+            'privileges': user['privileges']
         }, 'secret', algorithm='HS256'))
 
 

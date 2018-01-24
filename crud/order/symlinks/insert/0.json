@@ -1,0 +1,39 @@
+{
+    "ancillary": {
+        "uri": "",
+        "name": "",
+        "methods": [],
+        "parameters": {},
+        "privileges": []
+    },
+    "prime": {
+        "name": "insert",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "d": {
+                "order_id": "1"
+            }
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

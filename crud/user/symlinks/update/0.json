@@ -1,0 +1,48 @@
+{
+    "ancillary": {
+        "uri": "/<{username}>/add-privilege:<{privilege}>",
+        "name": "add_privilege",
+        "methods": ["POST"],
+        "parameters": {
+            "privilege": ["str", "uri"],
+            "username": ["str", "uri"]
+        },
+        "privileges": ["Z", "O"]
+    },
+    "prime": {
+        "name": "update",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {
+                "username": "{{ username }}"
+            },
+            "node": "privileges.{{ privilege }}",
+            "d": {
+                "status": "",
+                "shift": {}
+            },
+            "operator": "set"
+        }
+    },
+    "config": {
+        "name": "user",
+        "path": "users",
+        "collection": {
+            "name": "users",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

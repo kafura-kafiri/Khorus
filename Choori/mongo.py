@@ -44,29 +44,35 @@ class Mongo:
         print('connected to mongodb! {} with indexes created'.format(self._collection_name))
 
     @try_out("can't insert")
-    async def insert(self, D):
-        if type(D) is list:
+    async def insert(self, options, payload, D):
+        if type(D) is dict:
+            D = [D]
+        if '--username' in options:
+            for d in D:
+                d['username'] = payload['username']
+        if '--bulk' in options:
+            bulk = self.cache['bulk']
+            if len(bulk) < 10:
+                bulk.extend(D)
+            if len(bulk) >= 10:
+                result = await self.collection.insert_many(bulk)
+                bulk.clear()
+            else:
+                return {'status': 'bulked'}
+        else:
             result = await self.collection.insert_many(D)
-            return [str(_id) for _id in result.inserted_ids]
-        elif type(D) is dict:
-            result = await self.collection.insert_one(D)
-            return str(result.inserted_id)
-        raise Exception
+        return [str(_id) for _id in result.inserted_ids]
 
     @try_out("can't delete")
-    async def delete(self, query):
+    async def delete(self, options, payload, query):
         return await self.collection.delete_many(query)
 
     @try_out("can't update")
-    async def update(self, query, document):
-        return await self.collection.update(query, {'$set': document})
-
-    @try_out("can't patch")
-    async def patch(self, query, node, sub_document, mode):
-        return await self.collection.update(query, {'${}'.format(mode): {node: sub_document}})
+    async def update(self, options, payload, query, node, document, operator):
+        return await self.collection.update(query, {'${}'.format(operator): {node: document}})
 
     @try_out("can't find")
-    async def find(self, query, projection=None):
+    async def find(self, options, payload, query, projection):
         if projection:
             documents = await self.collection.find(query, projection).to_list(None)
         else:

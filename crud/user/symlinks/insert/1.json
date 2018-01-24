@@ -1,0 +1,63 @@
+{
+    "ancillary": {
+        "uri": "/init",
+        "name": "new_user",
+        "methods": ["POST"],
+        "parameters": {
+            "username": ["str", "form"],
+            "password": ["str", "form"],
+            "first_name": ["str", "form"],
+            "last_name": ["str", "form"],
+            "cellphone": ["str", "form"]
+        },
+        "privileges": []
+    },
+    "prime": {
+        "name": "insert",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "d": {
+                "username": "{{ username }}",
+                "password": "{{ password }}",
+                "first_name": "{{ first_name }}",
+                "last_name": "{{ last_name }}",
+                "cellphone": "{{ cellphone }}",
+                "salt": "",
+                "privilages": {},
+                "bank": {
+                    "name": "",
+                    "account": "",
+                    "fee_per_order": "",
+                    "fixed_salary": ""
+                },
+                "detail": {
+                    "probation": "",
+                    "mellicode": "",
+                    "birthdate": "",
+                    "sheba": ""
+                }
+            }
+        }
+    },
+    "config": {
+        "name": "user",
+        "path": "users",
+        "collection": {
+            "name": "users",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

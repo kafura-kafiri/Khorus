@@ -1,32 +1,13 @@
-@bp.route('/{{ name }}', methods=[
-    {% for method in methods %}
-        '{{ method | upper }}',
-    {% endfor %}
-])
-@privileges(
-    {% for privilage in privilages %}
-        '{{ privilage }}',
-    {% endfor %}
+
+
+@bp.route('{{ ancillary.uri }}'.format({% for parameter, (type, space) in ancillary.parameters.items() %}{% if space == 'uri' %}{{ paramter }}={{ parameter }}, {% endif %}{% endfor %}), methods=[{% for method in ancillary.methods %}'{{ method | upper }}', {% endfor %}])
+@privileges({% for privilege in ancillary.privileges %}'{{ privilege }}', {% endfor %})
+@retrieve({% for parameter, (type, space) in ancillary.parameters.items() %}{% if space != 'uri' %}
+    '<{{ type }}:{{ space }}:{{ parameter }}>', {% endif %}{% endfor %}
 )
-@retrieve(
-    {% for parameter in parameters %}
-        '<{{ parameter.type }}:{{ parameter.space }}:{{ parameter.name }}>',
-    {% endfor %}
-)
-async def send_location(request, payload,
-    {% for parameter in parameters %}
-        {{ parameter.name }},
-    {% endfor %}
-):
-    {% for prime_parameter in prime.parameters %}
-        {{ prime_parameter }},
-    {% endfor %} = render('func_key',
-        {% for paramter in parameters %}
-            {{ parameter.name }}={{ parameter.name }},
-        {% endfor %}
-        )
-    return await _{{ prime.name }}(request, {{ options }},
-        {% for paramter in parameters %}
-            {{ parameter.name }},
-        {% endfor %}
-        )
+async def {{ ancillary.name }}(request, payload, {% for parameter in ancillary.parameters %}{{ parameter }}, {% endfor %}):
+    {% for parameter, value in prime.parameters.items() %}{% if parameter != 'payload' %}
+    {{ parameter }} = {{ render_json(value) }}
+    {% endif %}{% endfor %}
+    return json(await {{ config.collection.name }}.{{ prime.name }}({% for parameter in prime.parameters %}{{ parameter }}, {% endfor %}))
+

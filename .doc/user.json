@@ -1,25 +1,28 @@
 {
   "username": "",
   "password": "",
-  "sheba": "",
   "firstname": "",
   "lastname": "",
   "cellphone": "",
   "salt": "",
-  "birthdate": "",
-  "roles":{  // may 2 person have save role diff permission.
+  "privileges":{
     "biker": {
-      "status": ""
+      "status": "",
+      "shift": {
+
+      }
     }
-  }
-  ,
+  },
   "bank": {
     "name": "",
-    "account": ""
+    "account": "",
+    "fee_per_order": "",
+    "fixed_salary": ""
   },
-  "probation": "",
-  "mellicode": "",
-  "shift": {},
-  "fee_per_order": "",
-  "fixed_salary": "",
+  "detail": {
+    "probation": "",
+    "mellicode": "",
+    "birthdate": "",
+    "sheba": ""
+  }
 }
