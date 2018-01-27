@@ -1,0 +1,45 @@
+{
+    "ancillary": {
+        "uri": "/<{_id}>/<{ack}>",
+        "name": "ack",
+        "methods": ["POST"],
+        "parameters": {
+            "_id": ["str", "uri"],
+            "ack": ["str", "uri"]
+        },
+        "privileges": ["dev", "porter"]
+    },
+    "prime": {
+        "name": "update",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "pouria",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {
+                "_id": "{{ _id }}"
+            },
+            "node": "status",
+            "d": "{{ ack }}",
+            "operator": "set"
+        }
+    },
+    "config": {
+        "name": "road",
+        "path": "roads",
+        "collection": {
+            "name": "roads",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

@@ -1,0 +1,18 @@
+{
+  "applicator": {
+    "cellphone": "",
+    "first_name": "",
+    "last_name": ""
+  },
+  "object": {
+    "code": "",
+    "detail": "",
+    "#": []
+  },
+  "src": [1, 1, ""],
+  "dst": [2, 3, ""],
+  "status": "",
+  "delay": "",
+  "road_id": "",
+  "username": "",
+}

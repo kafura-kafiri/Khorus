@@ -1,6 +1,6 @@
 
 
-@bp.route('{{ ancillary.uri }}'.format({% for parameter, (type, space) in ancillary.parameters.items() %}{% if space == 'uri' %}{{ paramter }}={{ parameter }}, {% endif %}{% endfor %}), methods=[{% for method in ancillary.methods %}'{{ method | upper }}', {% endfor %}])
+@bp.route('{{ ancillary.uri }}'.format({% for parameter, (type, space) in ancillary.parameters.items() %}{% if space == 'uri' %}{{ parameter }}='{{ parameter }}', {% endif %}{% endfor %}), methods=[{% for method in ancillary.methods %}'{{ method | upper }}', {% endfor %}])
 @privileges({% for privilege in ancillary.privileges %}'{{ privilege }}', {% endfor %})
 @retrieve({% for parameter, (type, space) in ancillary.parameters.items() %}{% if space != 'uri' %}
     '<{{ type }}:{{ space }}:{{ parameter }}>', {% endif %}{% endfor %}

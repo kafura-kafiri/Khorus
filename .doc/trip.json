@@ -1,4 +1,6 @@
 {
-  "status": "",
-  "": ""
+  "status": "init",
+  "src": [],
+  "dst": [],
+  "username": "-u",
 }

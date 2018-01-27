@@ -9,3 +9,54 @@ from crud import prime
 roads = Mongo(config['collection']['name'], config['collection']['indexes'])
 bp = Blueprint(config['name'], url_prefix=config['path'])
 prime(bp, roads, os.path.join(crud_path, config['name']), config)
+
+
+@bp.route('/init'.format(), methods=['POST', ])
+@privileges('dev', 'khorus', 'operator', )
+@retrieve(
+    '<num:form:src_lng>', 
+    '<num:form:src_lat>', 
+    '<num:form:dst_lng>', 
+    '<num:form:dst_lat>', 
+)
+async def init(request, payload, src_lng, src_lat, dst_lng, dst_lat, ):
+    
+    options = [
+        "--username",
+        "--date"
+    ]
+    
+    d = {
+        "status": "init",
+        "src": [
+            src_lng,
+            src_lat
+        ],
+        "dst": [
+            dst_lng,
+            dst_lat
+        ]
+    }
+    
+    return json(await roads.insert(options, payload, d, ))
+
+
+@bp.route('/<{_id}>/<{ack}>'.format(_id='_id', ack='ack', ), methods=['POST', ])
+@privileges('dev', 'porter', )
+@retrieve(
+)
+async def ack(request, payload, _id, ack, ):
+    
+    options = []
+    
+    query = {
+        "_id": _id
+    }
+    
+    node = "status"
+    
+    d = ack
+    
+    operator = "set"
+    
+    return json(await roads.update(options, payload, query, node, d, operator, ))

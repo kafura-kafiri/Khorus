@@ -1,0 +1,45 @@
+{
+    "ancillary": {
+        "uri": "/<{_id}>/@delay:<{delay}",
+        "name": "_delay",
+        "methods": ["POST"],
+        "parameters": {
+            "_id": ["str", "uri"],
+            "delay": ["num", "uri"]
+        },
+        "privileges": ["dev", "applicator"]
+    },
+    "prime": {
+        "name": "update",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "pouria",
+                "privileges": [
+                    "dev", "applicator"
+                ]
+            },
+            "query": {
+                "_id": "{{ _id }}"
+            },
+            "node": "delay",
+            "d": "{{ delay }}",
+            "operator": "inc"
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

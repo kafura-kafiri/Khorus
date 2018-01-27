@@ -1,0 +1,44 @@
+{
+    "ancillary": {
+        "uri": "/@shift",
+        "name": "update_all_shifts",
+        "methods": ["POST"],
+        "parameters": {
+            "shift": ["list", "form"]
+        },
+        "privileges": ["dev", "porter"]
+    },
+    "prime": {
+        "name": "update",
+        "parameters": {
+            "options": [
+                "--me"
+            ],
+            "payload": {
+                "username": "pouria",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {},
+            "node": "shift",
+            "d": "{{ shift }}",
+            "operator": "set"
+        }
+    },
+    "config": {
+        "name": "user",
+        "path": "users",
+        "collection": {
+            "name": "users",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

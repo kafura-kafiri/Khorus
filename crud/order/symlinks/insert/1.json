@@ -1,0 +1,64 @@
+{
+    "ancillary": {
+        "uri": "/init",
+        "name": "init",
+        "methods": ["POST"],
+        "parameters": {
+            "applicator": ["dict", "form"],
+            "src": []
+        },
+        "privileges": []
+    },
+    "prime": {
+        "name": "insert",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "pouria",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "d": {
+                "applicator": {
+                    "cellphone": "",
+                    "first_name": "",
+                    "last_name": ""
+                },
+                "_author": {},
+                "object": {
+                    "code": "",
+                    "detail": "",
+                    "#": []
+                },
+                "src": [
+                    1,
+                    2,
+                    ""
+                ],
+                "dst": [
+                    2,
+                    3,
+                    ""
+                ],
+                "status": "",
+                "delay": ""
+            }
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

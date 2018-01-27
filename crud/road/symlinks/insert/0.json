@@ -1,0 +1,53 @@
+{
+    "ancillary": {
+        "uri": "/init",
+        "name": "init",
+        "methods": ["POST"],
+        "parameters": {
+            "src_lng": ["num", "form"],
+            "src_lat": ["num", "form"],
+            "dst_lng": ["num", "form"],
+            "dst_lat": ["num", "form"]
+        },
+        "privileges": [
+            "dev",
+            "khorus",
+            "operator"
+        ]
+    },
+    "prime": {
+        "name": "insert",
+        "parameters": {
+            "options": [
+                "--username",
+                "--date"
+            ],
+            "payload": {
+                "username": "pouria",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "d": {
+                "status": "init",
+                "src": ["{{ src_lng }}", "{{ src_lat }}"],
+                "dst": ["{{ dst_lng }}", "{{ dst_lat }}"]
+            }
+        }
+    },
+    "config": {
+        "name": "road",
+        "path": "roads",
+        "collection": {
+            "name": "roads",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

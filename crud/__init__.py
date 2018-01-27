@@ -115,7 +115,7 @@ def prime(bp, mongo, path, config):
     @retrieve(
         '<dict:form:query>',
         '<str:form:node>',
-        '<dict:form:d>',
+        '<node:form:d>',
         '<str:form:operator>'
     )
     async def _update(request, options, payload, query, node, d, operator):

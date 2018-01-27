@@ -74,3 +74,46 @@ async def add_privilege(request, payload, privilege, username, ):
     operator = "set"
     
     return json(await users.update(options, payload, query, node, d, operator, ))
+
+
+@bp.route('/@status:<{status}>'.format(status='status', ), methods=['POST', ])
+@privileges('dev', 'porter', )
+@retrieve(
+)
+async def update_status(request, payload, status, ):
+    
+    options = [
+        "--me"
+    ]
+    
+    query = {}
+    
+    node = "status"
+    
+    d = status
+    
+    operator = "set"
+    
+    return json(await users.update(options, payload, query, node, d, operator, ))
+
+
+@bp.route('/@shift'.format(), methods=['POST', ])
+@privileges('dev', 'porter', )
+@retrieve(
+    '<list:form:shift>', 
+)
+async def update_all_shifts(request, payload, shift, ):
+    
+    options = [
+        "--me"
+    ]
+    
+    query = {}
+    
+    node = "shift"
+    
+    d = shift
+    
+    operator = "set"
+    
+    return json(await users.update(options, payload, query, node, d, operator, ))

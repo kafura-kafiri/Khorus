@@ -3,11 +3,14 @@ from sanic import response
 import jwt
 import ujson as json
 import numbers
+from bson import ObjectId
 
 maximal = {
     '-u': '--username',
     '-b': '--bulk',
     '-s': '--symlink',
+    '-m': '--me',
+    '-d': '--date',
 }
 
 
@@ -57,14 +60,20 @@ def retrieve(*requirements):
                     try:
                         param = json.loads(param)
                     except: pass
-                    if _type =='num':
+                    if _type == 'num':
                         if not isinstance(param, numbers.Real):
                             return response.json({'status': 'type mismatch'}, 404)
+                    elif _type == 'node':
+                        pass
                     elif param.__class__.__name__ != _type:
                         return response.json({'status': 'type mismatch'}, 404)
                 finally:
                     if param is None:
                         return response.json({'status': "can't retrieve"})
+                if _type == 'str' and '_id' in param:
+                    try:
+                        param = ObjectId(param)
+                    except: pass
                 parameters.append(param)
             return await f(request, *(args + tuple(parameters)), **kwargs)
         return decorated_function

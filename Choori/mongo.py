@@ -1,6 +1,7 @@
 from functools import wraps
 import asyncio
 from pymongo.errors import CollectionInvalid, ServerSelectionTimeoutError
+import datetime
 
 
 def try_out(message):
@@ -50,6 +51,10 @@ class Mongo:
         if '--username' in options:
             for d in D:
                 d['username'] = payload['username']
+        if '--date' in options:
+            now = datetime.datetime.now()
+            for d in D:
+                d['_date'] = now
         if '--bulk' in options:
             bulk = self.cache['bulk']
             if len(bulk) < 10:
@@ -65,14 +70,20 @@ class Mongo:
 
     @try_out("can't delete")
     async def delete(self, options, payload, query):
+        if '--me' in options:
+            query['username'] = payload['username']
         return await self.collection.delete_many(query)
 
     @try_out("can't update")
     async def update(self, options, payload, query, node, document, operator):
+        if '--me' in options:
+            query['username'] = payload['username']
         return await self.collection.update(query, {'${}'.format(operator): {node: document}})
 
     @try_out("can't find")
     async def find(self, options, payload, query, projection):
+        if '--me' in options:
+            query['username'] = payload['username']
         if projection:
             documents = await self.collection.find(query, projection).to_list(None)
         else:
@@ -82,9 +93,26 @@ class Mongo:
         return documents
 
     @try_out("can't aggregate")
-    async def aggregate(self, query, projection, ):
-        pass
-
-    @try_out("can't group")
-    async def group(self, query, projection):
-        pass
+    async def aggregate(self, options, payload, foreign, query, group, projection):
+        if '--me' in options:
+            query['username'] = payload['username']
+        documents =  await self.collection.aggregate([
+            {
+                "$lookup": {
+                    "from": foreign,
+                    "as": "{}_{}".format(self.collection.name, foreign),
+                    "pipeline": [
+                        {
+                            "$match": query,
+                        }, {
+                            "$group": group
+                        }, {
+                            "$project": projection
+                        }
+                    ]
+                }
+            }
+        ])
+        for doc in documents:
+            del doc['_id']
+        return documents

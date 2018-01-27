@@ -1,0 +1,44 @@
+{
+    "ancillary": {
+        "uri": "/users/@status:<{status}>",
+        "name": "update_status",
+        "methods": ["POST"],
+        "parameters": {
+            "status": ["node", "uri"]
+        },
+        "privileges": ["dev", "porter"]
+    },
+    "prime": {
+        "name": "update",
+        "parameters": {
+            "options": [
+                "--me"
+            ],
+            "payload": {
+                "username": "pouria",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {},
+            "node": "status",
+            "d": "{{ status }}",
+            "operator": "set"
+        }
+    },
+    "config": {
+        "name": "user",
+        "path": "users",
+        "collection": {
+            "name": "users",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}
