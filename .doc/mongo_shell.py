@@ -18,19 +18,26 @@ orders.aggregate([
     }
 ])
 
-[
-            {
-                "$match": query
-            },
-            {
+'''s = '''
+
+'''{
                 "$lookup": {
-                    "localField": "*",
                     "from": foreign,
-                    "foreignField": "*",
-                    "as": "{}_{}".format(self.collection.name, foreign)
+                    "as": "{}_{}".format(self.collection.name, foreign),
+                    "pipeline": [
+                        {
+                            "$match": query,
+                        }, {
+                            "$group": group
+                        }, {
+                            "$project": projection
+                        }
+                    ]
                 }
-            },
-            {
-                "$group": group
-            }
-        ]
+            }'''
+
+b = [
+    {
+
+    },
+]

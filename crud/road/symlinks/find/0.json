@@ -1,0 +1,44 @@
+{
+    "ancillary": {
+        "uri": "/@status:<{status}>",
+        "name": "user_trips",
+        "methods": ["POST"],
+        "parameters": {
+            "status": ["str", "uri"]
+        },
+        "privileges": ["dev", "porter"]
+    },
+    "prime": {
+        "name": "find",
+        "parameters": {
+            "options": [
+                "--me"
+            ],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {
+                "status": "{{ status }}"
+            },
+            "projection": {}
+        }
+    },
+    "config": {
+        "name": "road",
+        "path": "roads",
+        "collection": {
+            "name": "roads",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

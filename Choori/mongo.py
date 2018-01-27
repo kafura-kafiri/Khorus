@@ -93,26 +93,27 @@ class Mongo:
         return documents
 
     @try_out("can't aggregate")
-    async def aggregate(self, options, payload, foreign, query, group, projection):
+    async def aggregate(self, options, payload, query, group, projection, foreign=None):
         if '--me' in options:
             query['username'] = payload['username']
-        documents =  await self.collection.aggregate([
-            {
-                "$lookup": {
-                    "from": foreign,
-                    "as": "{}_{}".format(self.collection.name, foreign),
-                    "pipeline": [
-                        {
-                            "$match": query,
-                        }, {
-                            "$group": group
-                        }, {
-                            "$project": projection
-                        }
-                    ]
-                }
+        lookup = [{
+            "$lookup": {
+                "localField": "*",
+                "from": foreign,
+                "foreignField": "*",
+                "as": "{}_{}".format(self.collection.name, foreign)
             }
-        ])
+        }] if foreign else []
+        project = [{
+            "$project": projection
+        }] if projection else []
+        documents = await self.collection.aggregate([
+            {
+                "$match": query
+            }, *lookup, {
+                "$group": group
+            }, *project
+        ]).to_list(None)
         for doc in documents:
             del doc['_id']
         return documents

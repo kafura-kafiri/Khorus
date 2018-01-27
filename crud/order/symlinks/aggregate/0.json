@@ -1,0 +1,62 @@
+{
+    "ancillary": {
+        "uri": "/history-from:<{days}>",
+        "name": "history_from",
+        "methods": ["POST"],
+        "parameters": {
+            "days": ["num", "uri"]
+        },
+        "privileges": ["dev", "porter"]
+    },
+    "prime": {
+        "name": "aggregate",
+        "parameters": {
+            "options": [
+                "--me"
+            ],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {},
+            "group": {
+                "count": {
+                    "$sum": 1
+                },
+                "_id": "$username"
+            },
+            "projection": {
+                "yearMonthDay": {
+                    "$dateToString": {
+                        "format": "%Y-%m-%d",
+                        "date": "$_date"
+                    }
+                },
+                "count": {
+                    "$dateToString": {
+                        "format": "%H:%M:%S:%L",
+                        "date": "$_date"
+                    }
+                }
+            },
+            "foreign": null
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

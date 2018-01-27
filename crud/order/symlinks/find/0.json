@@ -1,0 +1,44 @@
+{
+    "ancillary": {
+        "uri": "/unassigned",
+        "name": "unassigned",
+        "methods": ["POST"],
+        "parameters": {},
+        "privileges": [
+            "dev", "khorus", "operator"
+        ]
+    },
+    "prime": {
+        "name": "find",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {
+                "username": {
+                    "$exists": false
+                }
+            },
+            "projection": {}
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

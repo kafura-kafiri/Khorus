@@ -49,6 +49,33 @@ def prime(bp, mongo, path, config):
     :param crud_path:
     :return:
     """
+
+    @bp.route('/!/', methods=['POST'])
+    @bp.route('/!/-<options>', methods=['POST'])
+    @bp.route('/!<foreign>/', methods=['POST'])
+    @bp.route('/!<foreign>/-<options>', methods=['POST'])
+    @handle_options()
+    @privileges('dev')
+    @retrieve(
+        '<dict:form:query>',
+        '<dict:form:group>',
+        '<dict:form:projection>',
+    )
+    async def _aggregate(request, options, payload, query, group, projection, foreign=None):
+        if '--symlink' not in options:
+            return json(await mongo.aggregate(options, payload, query, group, projection, foreign))
+        else:
+            options.remove('--symlink')
+            params = {
+                'options': options,
+                'payload': payload,
+                'query': query,
+                'group': group,
+                'projection': projection,
+                'foreign': foreign
+            }
+            return json(save('aggregate', params, path, config))
+
     @bp.route('/', methods=['POST'])
     @bp.route('/-<options>', methods=['POST'])
     @handle_options()

@@ -1,0 +1,60 @@
+{
+    "ancillary": {
+        "uri": "",
+        "name": "",
+        "methods": [],
+        "parameters": {},
+        "privileges": []
+    },
+    "prime": {
+        "name": "update",
+        "parameters": {
+            "options": [
+                "--me"
+            ],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {},
+            "group": {
+                "count": {
+                    "$sum": 1
+                },
+                "_id": "$username"
+            },
+            "projection": {
+                "yearMonthDay": {
+                    "$dateToString": {
+                        "format": "%Y-%m-%d",
+                        "date": "$_date"
+                    }
+                },
+                "count": {
+                    "$dateToString": {
+                        "format": "%H:%M:%S:%L",
+                        "date": "$date"
+                    }
+                }
+            },
+            "foreign": null
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

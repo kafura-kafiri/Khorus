@@ -1,0 +1,40 @@
+{
+    "ancillary": {
+        "uri": "",
+        "name": "",
+        "methods": [],
+        "parameters": {},
+        "privileges": []
+    },
+    "prime": {
+        "name": "find",
+        "parameters": {
+            "options": [
+                "--me"
+            ],
+            "payload": {
+                "username": "ali",
+                "privileges": [
+                    "dev"
+                ]
+            },
+            "query": {},
+            "projection": {}
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

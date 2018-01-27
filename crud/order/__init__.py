@@ -33,8 +33,6 @@ async def init(request, payload, applicator, object, src, dst, delay, ):
         "dst": dst,
         "status": "init",
         "delay": delay,
-        "road_id": "",
-        "username": ""
     }
     
     return json(await orders.insert(options, payload, d, ))
@@ -59,3 +57,61 @@ async def _delay(request, payload, _id, delay, ):
     operator = "inc"
     
     return json(await orders.update(options, payload, query, node, d, operator, ))
+
+
+@bp.route('/unassigned'.format(), methods=['POST', ])
+@privileges('dev', 'khorus', 'operator', )
+@retrieve(
+)
+async def unassigned(request, payload, ):
+    
+    options = []
+    
+    query = {
+        "username": {
+            "$exists": False
+        }
+    }
+    
+    projection = {}
+    
+    return json(await orders.find(options, payload, query, projection, ))
+
+
+@bp.route('/history-from:<{days}>'.format(days='days', ), methods=['POST', ])
+@privileges('dev', 'porter', )
+@retrieve(
+)
+async def history_from(request, payload, days, ):
+    
+    options = [
+        "--me"
+    ]
+    
+    query = {}
+    
+    group = {
+        "count": {
+            "$sum": 1
+        },
+        "_id": "$username"
+    }
+    
+    projection = {
+        "yearMonthDay": {
+            "$dateToString": {
+                "format": "%Y-%m-%d",
+                "date": "$_date"
+            }
+        },
+        "count": {
+            "$dateToString": {
+                "format": "%H:%M:%S:%L",
+                "date": "$_date"
+            }
+        }
+    }
+    
+    foreign = None
+    
+    return json(await orders.aggregate(options, payload, query, group, projection, foreign, ))
