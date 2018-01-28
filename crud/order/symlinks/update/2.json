@@ -1,0 +1,46 @@
+{
+    "ancillary": {
+        "uri": "/<{_id}>/@road_id=<{road_id}>",
+        "name": "set_road",
+        "methods": ["POST"],
+        "parameters": {
+            "_id": ["str", "uri"],
+            "road_id": ["str", "uri"]
+        },
+        "privileges": ["khorus", "dev", "operator"]
+    },
+    "prime": {
+        "name": "update",
+        "parameters": {
+            "options": [],
+            "payload": {
+                "username": "pouria",
+                "privileges": {
+                    "dev": "",
+                    "applicator": ""
+                }
+            },
+            "query": {
+                "_id": "{{ _id }}"
+            },
+            "node": "road_id",
+            "d": "{{ road_id }}",
+            "operator": "set"
+        }
+    },
+    "config": {
+        "name": "order",
+        "path": "orders",
+        "collection": {
+            "name": "orders",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

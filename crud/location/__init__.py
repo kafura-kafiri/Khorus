@@ -21,7 +21,8 @@ async def send_location(request, payload, lat, lng, ):
     
     options = [
         "--username",
-        "--bulk"
+        "--bulk",
+        "--date",
     ]
     
     d = {

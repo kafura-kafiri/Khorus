@@ -88,8 +88,15 @@ class Mongo:
             documents = await self.collection.find(query, projection).to_list(None)
         else:
             documents = await self.collection.find(query).to_list(None)
+        # TODO <- bad smell
         for doc in documents:
-            del doc['_id']
+            # del doc['_id']
+            for key in doc:
+                if '_id' in key:
+                    doc[key] = str(doc[key])
+        # #
+        '''for doc in documents:
+            del doc['_id']'''
         return documents
 
     @try_out("can't aggregate")
@@ -110,9 +117,10 @@ class Mongo:
         documents = await self.collection.aggregate([
             {
                 "$match": query
-            }, *lookup, {
+            }, *lookup, *project,
+            {
                 "$group": group
-            }, *project
+            },
         ]).to_list(None)
         for doc in documents:
             del doc['_id']

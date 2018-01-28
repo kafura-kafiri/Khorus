@@ -1,0 +1,2 @@
+sanic does not support <int:folan>
+_id in uri need to convert to ObjectId(_id) allal khosus for uri

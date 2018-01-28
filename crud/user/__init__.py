@@ -35,7 +35,7 @@ async def new_user(request, payload, username, password, first_name, last_name, 
         "last_name": last_name,
         "cellphone": cellphone,
         "salt": "",
-        "privilages": {},
+        "privileges": {},
         "bank": {
             "name": "",
             "account": "",
@@ -44,8 +44,8 @@ async def new_user(request, payload, username, password, first_name, last_name, 
         },
         "detail": {
             "probation": "",
-            "mellicode": "",
-            "birthdate": "",
+            "melli_code": "",
+            "birth_date": "",
             "sheba": ""
         }
     }
@@ -54,7 +54,7 @@ async def new_user(request, payload, username, password, first_name, last_name, 
 
 
 @bp.route('/<username>/add-privilege:<privilege>', methods=['POST', ])
-@privileges('Z', 'O', )
+@privileges('zoodfood', 'dev', )
 @retrieve()
 async def add_privilege(request, payload, privilege, username, ):
     
@@ -77,7 +77,7 @@ async def add_privilege(request, payload, privilege, username, ):
 
 
 @bp.route('/@status:<{status}>'.format(status='status', ), methods=['POST', ])
-@privileges('dev', 'porter', )
+@privileges('porter', )
 @retrieve(
 )
 async def update_status(request, payload, status, ):
@@ -88,21 +88,20 @@ async def update_status(request, payload, status, ):
     
     query = {}
     
-    node = "status"
+    node = "privileges.porter.status"
     
-    d = status
+    d = int(status)
     
     operator = "set"
     
     return json(await users.update(options, payload, query, node, d, operator, ))
 
 
-@bp.route('/@shift'.format(), methods=['POST', ])
-@privileges('dev', 'porter', )
+@bp.route('/@shift:<{shift}>=<{head}>,<{tail}>'.format(shift='shift', head='head', tail='tail'), methods=['POST', ])
+@privileges('porter', )
 @retrieve(
-    '<list:form:shift>', 
 )
-async def update_all_shifts(request, payload, shift, ):
+async def update_shift(request, payload, shift, head, tail, ):
     
     options = [
         "--me"
@@ -110,9 +109,9 @@ async def update_all_shifts(request, payload, shift, ):
     
     query = {}
     
-    node = "shift"
+    node = "privileges.porter.shift.{shift}".format(shift=shift)
     
-    d = shift
+    d = [int(head), int(tail)]
     
     operator = "set"
     
