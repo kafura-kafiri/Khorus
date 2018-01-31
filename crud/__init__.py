@@ -1,172 +1,134 @@
 from sanic.response import json
-from Choori.decorators import options as handle_options, privileges, retrieve
+from Choori.decorators import extract_options, privileges, retrieve
 from Choori.utility import render
 
 import os
 import json as native_json
 
 
-def save(prime_name, parameters, path, config):
-    data = {
-        'ancillary': {
-            'uri': '',
-            'name': '',
-            'methods': [],
-            'parameters': {},
-            'privileges': [],
-        },
-        'prime': {
-            'name': prime_name,
-            'parameters': parameters,
-        },
-        'config': config,
-    }
-    path = os.path.join(path, 'symlinks')
-    try:
-        os.mkdir(path)
-    except FileExistsError as e:
-        print(e)
-    except:
-        return {'status': "can't create folder SYMLINK"}
-    path = os.path.join(path, prime_name)
-    try:
-        os.mkdir(path)
-    except FileExistsError as e:
-        print(e)
-    except:
-        return {'status': "can't create folder {}".format(prime_name.upper())}
-    cnt = len(os.listdir(path))
-    with open(os.path.join(path, '{}.json'.format(cnt)), 'w+') as f:
-        f.write(native_json.dumps(data, indent=4))
-    return {'status': path}
-
-
-def prime(bp, mongo, path, config):
-    """
-
-    :param bp:
-    :param mongo:
-    :param crud_path:
-    :return:
-    """
-
-    @bp.route('/!/', methods=['POST'])
-    @bp.route('/!/-<options>', methods=['POST'])
-    @bp.route('/!<foreign>/', methods=['POST'])
-    @bp.route('/!<foreign>/-<options>', methods=['POST'])
-    @handle_options()
-    @privileges('dev')
-    @retrieve(
-        '<dict:form:query>',
-        '<dict:form:group>',
-        '<dict:form:projection>',
-    )
-    async def _aggregate(request, options, payload, query, group, projection, foreign=None):
-        if '--symlink' not in options:
-            return json(await mongo.aggregate(options, payload, query, group, projection, foreign))
-        else:
-            options.remove('--symlink')
-            params = {
-                'options': options,
-                'payload': payload,
-                'query': query,
-                'group': group,
-                'projection': projection,
-                'foreign': foreign
-            }
-            return json(save('aggregate', params, path, config))
-
-    @bp.route('/', methods=['POST'])
-    @bp.route('/-<options>', methods=['POST'])
-    @handle_options()
-    @privileges('dev')
-    @retrieve(
-        '<dict:form:query>',
-        '<dict:form:projection>',
-    )
-    async def _get(request, options, payload, query, projection):
-        if '--symlink' not in options:
-            return json(await mongo.find(options, payload, query, projection))
-        else:
-            options.remove('--symlink')
-            params = {
-                'options': options,
-                'payload': payload,
-                'query': query,
-                'projection': projection
-            }
-            return json(save('find', params, path, config))
+def prime(bp, mongo, _path, config):
+    def save(prime_name, parameters):
+        data = {
+            'ancillary': {
+                'uri': {
+                    'route': '',
+                    'methods': [],
+                },
+                'method_name': '',
+                'parameters': {},
+                'privileges': ['dev'],
+            },
+            'prime': {
+                'method_name': prime_name,
+                'parameters': parameters,
+            },
+            'config': config,
+        }
+        path = os.path.join(_path, 'symlinks')
+        try:
+            os.mkdir(path)
+        except FileExistsError as e:
+            print(e)
+        except:
+            return {'status': "can't create folder SYMLINK"}
+        path = os.path.join(path, prime_name)
+        try:
+            os.mkdir(path)
+        except FileExistsError as e:
+            print(e)
+        except:
+            return {'status': "can't create folder {}".format(prime_name.upper())}
+        cnt = len(os.listdir(path))
+        with open(os.path.join(path, '{}.json'.format(cnt)), 'w+') as f:
+            f.write(native_json.dumps(data, indent=4))
+        return {'status': path}
 
     @bp.route('/', methods=['PUT'])
     @bp.route('/-<options>', methods=['PUT'])
-    @handle_options()
+    @extract_options()
     @privileges('dev')
     @retrieve(
-        '<dict:form:d>'
-    )  # add bulk, add user options.
-    async def _post(request, options, payload, d):
+        '<d:dict:$form:a>'
+    )
+    async def _put(request, payload, d, options):
         if '--symlink' not in options:
             return json(await mongo.insert(options, payload, d))
         else:
-            options.remove('--symlink')
+            del options['--symlink']
             params = {
                 'options': options,
                 'payload': payload,
                 'd': d,
             }
-            return json(save('insert', params, path, config))
+            return json(save('insert', params))
 
     @bp.route('/', methods=['DELETE'])
     @bp.route('/-<options>', methods=['DELETE'])
-    @handle_options()
+    @extract_options()
     @privileges('dev')
     @retrieve(
-        '<dict:form:query>'
+        '<query:dict:$form:a>'
     )
-    async def _delete(request, options, payload, query):
+    async def _delete(request, payload, query, options):
         if '--symlink' not in options:
             return json(await mongo.delete(options, payload, query))
         else:
-            options.remove('--symlink')
+            del options['--symlink']
             params = {
                 'options': options,
                 'payload': payload,
                 'query': query,
             }
-            return json(save('update', params, path, config))
+            return json(save('update', params))
 
     @bp.route('/', methods=['PATCH'])
     @bp.route('/-<options>', methods=['PATCH'])
-    @handle_options()
+    @extract_options()
     @privileges('dev')
     @retrieve(
-        '<dict:form:query>',
-        '<str:form:node>',
-        '<node:form:d>',
-        '<str:form:operator>'
+        '<query:dict:$form:a>',
+        '<updating_json:dict:$form:a>',
     )
-    async def _update(request, options, payload, query, node, d, operator):
+    async def _update(request, payload, query, updating_json, options):
         if '--symlink' not in options:
-            return json(await mongo.update(options, payload, query, node, d, operator))
+            return json(await mongo.update(options, payload, query, updating_json))
         else:
-            options.remove('--symlink')
+            del options['--symlink']
             params = {
                 'options': options,
                 'payload': payload,
                 'query': query,
-                'node': node,
-                'd': d,
-                'operator': operator,
+                'updating_json': updating_json
             }
-            return json(save('update', params, path, config))
+            return json(save('update', params))
+
+    @bp.route('/', methods=['POST'])
+    @bp.route('/-<options>', methods=['POST'])
+    @extract_options()
+    @privileges('dev')
+    @retrieve(
+        '<query:dict:$form:a>',
+    )
+    async def _get(request, payload, query, options, **kwargs):
+        if '--symlink' not in options:
+            return json(await mongo.find(options, payload, query, **kwargs))
+        else:
+            del options['--symlink']
+            params = {
+                'options': options,
+                'payload': payload,
+                'query': query,
+                **kwargs,
+            }
+            return json(save('find', params))
 
     @bp.route('/@', methods=['POST'])
     @privileges('dev')
     @retrieve(
-        '<dict:form:symlink>',
+        '<symlink:dict:$form:a>',
     )
-    async def symlink(request, payload, symlink):
-        _path = os.path.join(path, '__init__.py')
-        with open(_path, 'a') as f:
+    async def _symlink(request, payload, symlink):
+        path = os.path.join(_path, '__init__.py')
+        with open(path, 'a') as f:
             f.write(render('primes/symlink.py.jinja', symlink))
         return json({'status': 'congratulations'})

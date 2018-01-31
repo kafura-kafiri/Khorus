@@ -11,7 +11,7 @@
   },
   "src": [1, 1, ""],
   "dst": [2, 3, ""],
-  "status": "[init, auto, porting, delivered]",
+  "status": "[init, porting, ported]",
   "delay": "",
   "road_id": "",
   "username": ""

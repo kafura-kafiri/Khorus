@@ -1,0 +1,42 @@
+{
+    "ancillary": {
+        "uri": {
+            "route": "/<huli:int>",
+            "methods": ["post"]
+        },
+        "method_name": "huli",
+        "parameters": {
+            "you": ["str", "form"]
+        },
+        "privileges": ["dev"]
+    },
+    "prime": {
+        "method_name": "find",
+        "parameters": {
+            "options": {},
+            "payload": {
+                "username": "pouria",
+                "privileges": {
+                    "dev": "",
+                    "applicator": ""
+                }
+            },
+            "query": {}
+        }
+    },
+    "config": {
+        "name": "user",
+        "path": "users",
+        "collection": {
+            "name": "users",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

@@ -1,5 +1,2 @@
-false -> False in symlink.py.jinja
-pagination to choori.
-sort to choori.
 dashboard
 resources

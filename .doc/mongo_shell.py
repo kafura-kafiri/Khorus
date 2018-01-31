@@ -35,6 +35,7 @@ user = {
 
 pouria = deepcopy(user)
 mohsen = deepcopy(user)
+behruz = deepcopy(user)
 khorus = deepcopy(user)
 shahin = deepcopy(user)
 pouria['username'] = 'pouria'
@@ -62,6 +63,19 @@ mohsen['privileges']['porter'] = {
 mohsen['bank'] = {}
 mohsen['detail'] = {}
 
+behruz['username'] = 'behruz'
+behruz['password'] = set_password('behruzi')
+behruz['first_name'] = 'behruz'
+behruz['last_name'] = 'behruzi'
+behruz['cellphone'] = '+989133657623'
+behruz['privileges']['porter'] = {
+    "status": 1,
+    "shift": {
+        "lunch": [4, 7],
+        "dinner": [9, 10],
+    }
+}
+
 khorus['username'] = 'khorus'
 khorus['password'] = set_password('ququli')
 khorus['first_name'] = 'khorus'
@@ -81,7 +95,7 @@ shahin['bank'] = {}
 shahin['detail'] = {}
 
 users.delete_many({})
-users.insert_many([pouria, mohsen, khorus, shahin])
+users.insert_many([pouria, mohsen, behruz, khorus, shahin])
 
 
 print([user for user in users.find({})])
@@ -120,6 +134,10 @@ ferdous_1['applicator'] = pouria['username']
 ferdous_1['dst'] = [35.723267, 51.320185, ""]
 ferdous_1["_date"] = _yesterday + datetime.timedelta(days=1)
 
+jordan_1['username'] = 'mohsen'
+jordan_1['status'] = 'delivered'
+jordan_3['username'] = 'mohsen'
+
 orders.delete_many({})
 orders.insert_many([jordan_1, jordan_2, jordan_3, ferdous_1])
 
@@ -139,3 +157,20 @@ roads.delete_many({})
 roads.insert_one(road)
 jordan_1['road_id'] = road['_id']
 orders.save(jordan_1)
+
+location_1 = {
+    "p": [0, 0],
+    "username": "behruz",
+    "_date": datetime.datetime.now() - datetime.timedelta(seconds=3),
+    "#": [],
+}
+
+location_2 = {
+    "p": [1, 1],
+    "username": "behruz",
+    "_date": datetime.datetime.now(),
+    "#": [],
+}
+
+locations.delete_many({})
+locations.insert_many([location_1, location_2])

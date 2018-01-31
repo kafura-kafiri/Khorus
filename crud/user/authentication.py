@@ -7,8 +7,8 @@ import jwt
 
 @bp.route('/signup', methods=['POST'])
 @retrieve(
-    '<str:form:username>',
-    '<str:form:password>'
+    '<username:str:$form:a>',
+    '<password:str:$form:a>'
 )
 async def signup(request, username, password):
     u = {
@@ -24,8 +24,8 @@ async def signup(request, username, password):
 
 @bp.route('/key', methods=['POST'])
 @retrieve(
-    '<str:form:username>',
-    '<str:form:password>'
+    '<username:str:$form:a>',
+    '<password:str:$form:a>'
 )
 async def create_key(request, username, password):
     u = {
@@ -33,11 +33,10 @@ async def create_key(request, username, password):
         'password': password
     }
     from Choori.utility import check_password
-    _users = await users.find([], {}, {'username': u['username']}, {})
+    _users = await users.find({}, {}, {'username': u['username']})
     if not _users:
         return text('user not found')
     user = _users[0]
-    print(user)
     if not check_password(u['password'], user['password']):
         return json({'status': 'not_authorized'}, 403)
     return text(jwt.encode(

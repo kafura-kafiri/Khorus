@@ -1,2 +1,20 @@
-sanic does not support <int:folan>
-_id in uri need to convert to ObjectId(_id) allal khosus for uri
+_id in uri need to convert to ObjectId(_id) # not now -> allal khosus for uri
+false -> False in symlink.py.jinja
+pagination to choori, sort #DONE
+
+_inserting_date
+_inserting_author
+_updating_date
+_updating_author
+
+
+decorator #done must debug.
+insert #done
+
+_q:inserting_author,
+_q:username,
+_
+
+ancillaries;
+
+in symlink add params of uri in uri.params;

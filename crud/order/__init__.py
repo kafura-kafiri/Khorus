@@ -145,3 +145,24 @@ async def set_road(request, payload, _id, road_id, ):
     operator = "set"
     
     return json(await orders.update(options, payload, query, node, d, operator, ))
+
+
+@bp.route('/@status:<{status}>'.format(status='status', ), methods=['POST', ])
+@privileges('dev', 'porter', )
+@retrieve(
+)
+async def user_trips(request, payload, status, ):
+    options = [
+        "--me"
+    ]
+
+    today = datetime.datetime.now()
+    today = today.replace(hour=0, minute=0, second=0)
+    query = {
+        "status": status,
+        "_date": {"$gte": today}
+    }
+
+    projection = {}
+
+    return json(await orders.find(options, payload, query, projection, ))

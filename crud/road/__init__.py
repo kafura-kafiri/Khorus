@@ -21,11 +21,12 @@ prime(bp, roads, os.path.join(crud_path, config['name']), config)
     '<num:form:src_lng>',
     '<num:form:dst_lat>',
     '<num:form:dst_lng>',
+    '<str:form:username>',
 )
-async def init(request, payload, src_lng, src_lat, dst_lng, dst_lat, ):
+async def init(request, payload, src_lng, src_lat, dst_lng, dst_lat, username, ):
     
     options = [
-        "--date"
+        "--date",
     ]
     
     d = {
@@ -36,7 +37,8 @@ async def init(request, payload, src_lng, src_lat, dst_lng, dst_lat, ):
         "dst": [
             dst_lat,
             dst_lng
-        ]
+        ],
+        "username": username
     }
     
     return json(await roads.insert(options, payload, d, ))
@@ -63,25 +65,3 @@ async def ack(request, payload, _id, ack, ):
     order_result = await orders.update(options, payload, {"road_id": ObjectId(_id)}, node, d, operator)
     road_result = await roads.update(options, payload, query, node, d, operator, )
     return json([order_result, road_result])
-
-
-@bp.route('/@status:<{status}>'.format(status='status', ), methods=['POST', ])
-@privileges('dev', 'porter', )
-@retrieve(
-)
-async def user_trips(request, payload, status, ):
-    
-    options = [
-        "--me"
-    ]
-
-    today = datetime.datetime.now()
-    today = today.replace(hour=0, minute=0, second=0)
-    query = {
-        "status": status,
-        "_date": {"$gte": today}
-    }
-    
-    projection = {}
-    
-    return json(await roads.find(options, payload, query, projection, ))

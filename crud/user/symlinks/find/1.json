@@ -1,0 +1,40 @@
+{
+    "ancillary": {
+        "uri": {
+            "route": "",
+            "methods": ["post"]
+        },
+        "method_name": "",
+        "parameters": {},
+        "privileges": []
+    },
+    "prime": {
+        "method_name": "find",
+        "parameters": {
+            "options": {},
+            "payload": {
+                "username": "pouria",
+                "privileges": {
+                    "dev": "",
+                    "applicator": ""
+                }
+            },
+            "query": {}
+        }
+    },
+    "config": {
+        "name": "user",
+        "path": "users",
+        "collection": {
+            "name": "users",
+            "indexes": [
+                [
+                    [
+                        "username",
+                        1
+                    ]
+                ]
+            ]
+        }
+    }
+}

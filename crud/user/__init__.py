@@ -5,6 +5,7 @@ import os
 from sanic import Blueprint
 from sanic.response import json
 from crud import prime
+import datetime
 
 users = Mongo(config['collection']['name'], config['collection']['indexes'])
 bp = Blueprint(config['name'], url_prefix=config['path'])
@@ -116,3 +117,110 @@ async def update_shift(request, payload, shift, head, tail, ):
     operator = "set"
     
     return json(await users.update(options, payload, query, node, d, operator, ))
+
+
+#  manual
+@bp.route('/frees', methods=["POST"])
+@privileges('khorus', 'dev', 'operator')
+async def frees(request, payload, ):
+    now = datetime.datetime.now()
+    now = now.hour * 3600 + now.minute * 60 + now.second
+    now = 4
+    params = [
+        {
+            "$match": {
+                "$and": [
+                    {
+                        "privileges.porter.status": 1
+                    }, {
+                        "$or": [
+                            {
+                                "$and": [
+                                    {
+                                        "privileges.porter.shift.lunch.0": {
+                                            "$lte": now,
+                                        },
+                                    }, {
+                                        "privileges.porter.shift.lunch.1": {
+                                            "$gt": now
+                                        }
+                                    },
+                                ]
+                            }, {
+                                "$and": [
+                                    {
+                                        "privileges.porter.shift.dinner.0": {
+                                            "$lte": now,
+                                        },
+                                    }, {
+                                        "privileges.porter.shift.dinner.1": {
+                                            "$gt": now
+                                        }
+                                    },
+                                ]
+                            }
+                        ]
+                    },
+                ]
+            }
+        }, {
+            "$lookup": {
+                "from": "orders",
+                "let": {
+                    "porter": "$username"
+                },
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    {"$ne": ["$status", "delivered"]},
+                                    {"$ne": ["$username", "$$porter"]}
+                                ],
+                            }
+                        }
+                    },
+                    {
+                        "$group": {
+                            "busies": {
+                                "$addToSet": "$username"
+                            },
+                            "_id": "$$porter"
+                        }
+                    },
+                ],
+                "as": "orders"
+            }
+        }, {
+            "$match": {
+                "orders.0.busies": {"$ne": []}
+            }
+        }, {
+            "$lookup": {
+                "from": "locations",
+                "let": {
+                    "porter": "$username"
+                },
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    {"$eq": ["$username", "$$porter"]}
+                                ]
+                            }
+                        },
+                    }, {
+                        "$sort": {
+                            "_date": -1
+                        }
+                    }, {
+                        "$limit": 1
+                    }
+                ],
+                "as": "location"
+            }
+        }
+    ]
+    _users = await users.collection.aggregate(params).to_list(None)
+    return json(_users)

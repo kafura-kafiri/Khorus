@@ -48,13 +48,13 @@ class Mongo:
     async def insert(self, options, payload, D):
         if type(D) is dict:
             D = [D]
-        if '--username' in options:
+        if '--author' in options:
             for d in D:
-                d['username'] = payload['username']
+                d['_inserting_author'] = payload['username']
         if '--date' in options:
             now = datetime.datetime.now()
             for d in D:
-                d['_date'] = now
+                d['_inserting_date'] = now
         if '--bulk' in options:
             bulk = self.cache['bulk']
             if len(bulk) < 10:
@@ -70,58 +70,45 @@ class Mongo:
 
     @try_out("can't delete")
     async def delete(self, options, payload, query):
-        if '--me' in options:
-            query['username'] = payload['username']
+        if '--query' in options:
+            query[options['--query']] = payload['username']
         return await self.collection.delete_many(query)
 
     @try_out("can't update")
-    async def update(self, options, payload, query, node, document, operator):
-        if '--me' in options:
-            query['username'] = payload['username']
-        return await self.collection.update(query, {'${}'.format(operator): {node: document}})
+    async def update(self, options, payload, query, updating_json):
+        if '--query' in options:
+            query[options['--query']] = payload['username']
+        if '--author' in options:
+            if '$set' not in updating_json:
+                updating_json['$set'] = {}
+            updating_json['$set']['_updating_author'] = payload['username']
+        if '--date' in options:
+            if '$set' not in updating_json:
+                updating_json['$set'] = {}
+            updating_json['$set']['_updating_date'] = datetime.datetime.now()
+        return await self.collection.update(query, updating_json)
 
     @try_out("can't find")
-    async def find(self, options, payload, query, projection):
-        if '--me' in options:
-            query['username'] = payload['username']
-        if projection:
-            documents = await self.collection.find(query, projection).to_list(None)
-        else:
-            documents = await self.collection.find(query).to_list(None)
-        # TODO <- bad smell
+    async def find(self, options, payload, query, project=None, sort=None, skip=None, limit=None):
+        if '--query' in options:
+            query[options['--query']] = payload['username']
+        args = [query]
+        if project is not None:
+            args.append(project)
+        documents = self.collection.find(*args)
+        if skip is not None:
+            documents = documents.skip(skip)
+        if limit is not None:
+            documents = documents.limit(limit)
+        if sort is not None:
+            sort = [(key, value) for key, value in sort.items()]
+            documents = documents.sort(sort)
+        documents = await documents.to_list(None)
         for doc in documents:
-            # del doc['_id']
-            for key in doc:
-                if '_id' in key:
-                    doc[key] = str(doc[key])
-        # #
-        '''for doc in documents:
-            del doc['_id']'''
+            del doc['_id']
         return documents
 
     @try_out("can't aggregate")
-    async def aggregate(self, options, payload, query, group, projection, foreign=None):
-        if '--me' in options:
-            query['username'] = payload['username']
-        lookup = [{
-            "$lookup": {
-                "localField": "*",
-                "from": foreign,
-                "foreignField": "*",
-                "as": "{}_{}".format(self.collection.name, foreign)
-            }
-        }] if foreign else []
-        project = [{
-            "$project": projection
-        }] if projection else []
-        documents = await self.collection.aggregate([
-            {
-                "$match": query
-            }, *lookup, *project,
-            {
-                "$group": group
-            },
-        ]).to_list(None)
-        for doc in documents:
-            del doc['_id']
+    async def aggregate(self, options, payload, aggregation):
+        documents = await self.collection.aggregate(aggregation).to_list(None)
         return documents
