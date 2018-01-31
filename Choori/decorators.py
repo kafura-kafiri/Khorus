@@ -49,7 +49,7 @@ def privileges(*roles):
             except:
                 return response.json({'status': 'not_authorized'}, 403)
             if not roles or (payload['privileges'] and not set(payload['privileges']).isdisjoint(roles)):
-                rv = await f(request, *(args + (payload,)), **kwargs)
+                rv = await f(request, *((payload,) + args), **kwargs)
                 return rv
             else:
                 return response.json({'status': 'roles_disjoint', 'roles_required': roles}, 403)

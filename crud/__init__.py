@@ -129,6 +129,11 @@ def prime(bp, mongo, _path, config):
     )
     async def _symlink(request, payload, symlink):
         path = os.path.join(_path, '__init__.py')
+        route = symlink['ancillary']['uri']['route']
+        lefts = route.split('<')[1:]
+        rights = [left.split('>')[0] for left in lefts]
+        rights = [right.split(':')[0] for right in rights]
+        symlink['ancillary']['uri']['parameters'] = rights
         with open(path, 'a') as f:
-            f.write(render('primes/symlink.py.jinja', symlink))
+            f.write(render('primes/symlink.py.min.jinja', symlink))
         return json({'status': 'congratulations'})

@@ -30,7 +30,7 @@ import jwt
 # e_jwt = jwt.encode({'username': 'shahin', 'password': 'qarebaqi'}, 'secret', algorithm='HS256')
 # payload = jwt.decode(e_jwt, 'secret', algorithms=['HS256'])
 
-
+import pprint
 def render(path, data):
     env = Environment(loader=FileSystemLoader('Choori/templates'))
 
@@ -38,8 +38,11 @@ def render(path, data):
         s = json.dumps(tree, indent=4)
         ss = s.split('\n')
         s = '\n    '.join(ss)
-        s = s.replace('"{{ ', '')
-        s = s.replace(' }}"', '')
+        s = s.replace('"$', '')
+        s = s.replace('$"', '')
+        s = s.replace('null,', 'None,')
+        s = s.replace('false,', 'False,')
+        s = s.replace('true,', 'True,')
         return s
     env.globals.update(render_json=render_json)
     template = env.get_template(path)
